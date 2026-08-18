@@ -64,8 +64,15 @@
     .custom { display:grid; grid-template-columns:1fr auto; gap:8px; margin-top:10px; }
     .custom input { min-width:0; }
     .notice { padding:11px 12px; background:var(--peach); border-left:3px solid var(--yellow); color:#5d491c; font-size:13px; line-height:1.4; }
+    .research { margin-top:15px; padding:13px; border:1px solid #b9d8cd; border-radius:6px; background:#f8fcfa; }
+    .research-toggle { display:flex; align-items:center; gap:9px; margin:0; color:var(--green-dark); font-size:14px; text-transform:none; }
+    .research-toggle input { width:18px; height:18px; min-height:0; accent-color:var(--green); }
+    .research-sources { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:12px; }
+    .research-sources[aria-disabled="true"] { opacity:.48; pointer-events:none; }
+    .research-source { display:flex; align-items:center; gap:7px; margin:0; color:var(--ink); font-size:13px; text-transform:none; }
+    .research-source input { width:16px; height:16px; min-height:0; accent-color:var(--green); }
     @media (max-width:950px) { .layout { grid-template-columns:1fr; } .output { min-height:360px; } }
-    @media (max-width:600px) { .wrap { width:min(100vw - 24px,1220px); } .topbar { min-height:68px; } .chip { display:none; } .grid { grid-template-columns:1fr; } .custom { grid-template-columns:1fr; } }
+    @media (max-width:600px) { .wrap { width:min(100vw - 24px,1220px); } .topbar { min-height:68px; } .chip { display:none; } .grid { grid-template-columns:1fr; } .custom,.research-sources { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
@@ -77,6 +84,7 @@
       <section class="panel"><div class="panel-head"><h2>Koncept článku</h2><button class="button ghost" id="fillExample" type="button">Vložit šablonu</button></div><div class="body">
         <div class="grid"><div><label for="destination">Destinace / téma</label><input id="destination" placeholder="Např. Madeira s dětmi"></div><div><label for="articleType">Typ článku</label><select id="articleType"><option>Co vidět + MAPA</option><option>Naše dovolená s dětmi</option><option>Jak ušetřit</option><option>Itinerář</option><option>Praktický návod</option></select></div></div>
         <div style="margin-top:15px"><label for="brief">Hrubé poznámky</label><textarea id="brief" placeholder="Napiš body klidně nepořádně: kdy jste byli, s kým, doprava, co bylo top, co se nepovedlo, ceny, ubytování, děti, co se vyplatí a na co pozor..."></textarea></div>
+        <div class="research"><label class="research-toggle" for="researchEnabled"><input id="researchEnabled" type="checkbox">Deep research před psaním</label><div class="research-sources" id="researchSources" aria-disabled="true"><label class="research-source"><input type="checkbox" value="Reddit" checked>Reddit</label><label class="research-source"><input type="checkbox" value="X">X</label><label class="research-source"><input type="checkbox" value="Cestovatelské blogy" checked>Cestovatelské blogy</label><label class="research-source"><input type="checkbox" value="Diskuze a fóra" checked>Diskuze a fóra</label><label class="research-source"><input type="checkbox" value="Oficiální zdroje" checked>Oficiální zdroje</label></div></div>
     <div class="actions"><button class="button primary" id="buildPrompt" type="button">Připravit zadání</button><button class="button secondary" id="copyPrompt" type="button">Kopírovat výstup</button><button class="button ghost" id="clearAll" type="button">Vyčistit</button><span class="action-status" id="actionStatus" role="status" aria-live="polite"></span></div>
       </div></section>
       <aside class="stack">
@@ -108,6 +116,8 @@
     const destination = document.getElementById("destination");
     const articleType = document.getElementById("articleType");
     const brief = document.getElementById("brief");
+    const researchEnabled = document.getElementById("researchEnabled");
+    const researchSources = document.getElementById("researchSources");
     const output = document.getElementById("output");
     const promptPanel = document.getElementById("promptPanel");
     const actionStatus = document.getElementById("actionStatus");
@@ -128,6 +138,8 @@
       mediaList.querySelectorAll(".remove").forEach(button => button.addEventListener("click", () => { URL.revokeObjectURL(photos[Number(button.dataset.index)].preview); photos.splice(Number(button.dataset.index), 1); renderPhotos(); }));
     }
     function selectedAffiliates() { return affiliates.filter(item => item.checked && item.url); }
+    function selectedResearchSources() { return [...researchSources.querySelectorAll('input:checked')].map(input => input.value); }
+    function syncResearchSources() { researchSources.setAttribute("aria-disabled", String(!researchEnabled.checked)); }
     function sanitizeArticleHtml(html) {
       const template = document.createElement("template");
       template.innerHTML = html;
@@ -184,14 +196,16 @@
       const chosen = selectedAffiliates();
       const dest = destination.value.trim() || "[DOPLNIT DESTINACI]";
       const notes = brief.value.trim() || "[DOPLNIT HRUBÉ POZNÁMKY]";
+      const researchBlock = researchEnabled.checked ? `PŘED PSANÍM PROVEĎ DEEP RESEARCH:\n- Hledej k tématu ${dest} ve zdrojích: ${selectedResearchSources().join(", ") || "[DOPLNIT ZDROJE]"}.\n- Z uživatelských zdrojů vytěž praktické zkušenosti, opakující se varování, reálné tipy a lokální nuance. Zkušenost jednotlivce vždy označ jako anekdotu, ne jako ověřený fakt.\n- Aktuální fakta, ceny, otevírací dobu, dopravu a bezpečnost ověřuj v oficiálních zdrojích; neověřené věci do článku nedávej nebo označ [OVĚŘIT].\n- Před článkem vrať stručné shrnutí research: zdroj s odkazem, zjištění, jak je čerstvé a co se potvrdilo z více zdrojů.\n- Neopisuj dlouhé pasáže, nepoužívej nedoložené příspěvky z X jako fakta a nevymýšlej citace.\n\n` : "";
       const affiliateBlock = chosen.length ? chosen.map(item => { const attributes = item.type === "own-article" ? "bez povinných atributů" : item.type === "own-product" ? "target=\"_blank\"" : "target=\"_blank\" rel=\"sponsored nofollow\""; const priority = item.type && item.type !== "affiliate" ? "Když přesně sedí k tématu, má přednost před affiliate odkazem. " : ""; return `- ${item.name}: ${item.url}\n  ${priority}Použij jen, pokud se přirozeně týká obsahu. Jeden odkaz maximálně jednou; kotvu napiš konkrétně podle věty a použij ${attributes}.`; }).join("\n") : "- Žádný odkaz není pro tento draft vybraný.";
       const photoBlock = photos.length ? photos.map((item, index) => `${index + 1}. ${item.file.name} -> umísti k relevantnímu odstavci jako <!-- FOTO: ${item.file.name} | alt: [OVĚŘIT ALT TEXT] -->`).join("\n") : "- Nejsou přiložené žádné fotky.";
-      output.value = `Připrav koncept článku ve stylu Cestuj za babku jako WordPress HTML draft.\n\nDESTINACE / TÉMA: ${dest}\nTYP ČLÁNKU: ${articleType.value}\n\nSTYL:\n- Piš česky, osobně, prakticky a bez turistických klišé. Opírej se o vlastní zkušenost z poznámek: my, já, za mě, pozor na, s dětmi pohoda.\n- Začni rovnou užitečným dojmem a pro koho cesta je. Přidej dopravu, auto, ubytování, ceny, děti, jídlo, parkování a varování jen pokud vyplývají z poznámek.\n- Nevymýšlej aktuální ceny, otevírací dobu, konkrétní hotel, výlet ani obsah fotky. Chybějící údaj označ [OVĚŘIT: co doplnit].\n- U plnohodnotného článku míř na 7 300 znaků včetně mezer; přirozené rozmezí je 6 500-8 500 znaků. Délku vyplň konkrétními užitečnými detaily, ne vatou.\n- Používej jen <h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>. Nevkládej obsahový box.\n\nPRAVIDLA PRO ODKAZY:\n${affiliateBlock}\n\nFOTKY:\n${photoBlock}\n\nVRAŤ V TOMTO POŘADÍ:\n1. Tři návrhy titulku\n2. Doporučený slug\n3. Meta description (150-160 znaků)\n4. Stručnou osnovu\n5. WordPress HTML draft\n6. Použité odkazy: služba nebo materiál, přesná kotva, důvod a sekce článku\n7. Fotky: soubor, navržené umístění, alt text k doplnění\n8. Co ověřit nebo doplnit\n\nHRUBÝ KONCEPT:\n${notes}`;
+      output.value = `Připrav koncept článku ve stylu Cestuj za babku jako WordPress HTML draft.\n\nDESTINACE / TÉMA: ${dest}\nTYP ČLÁNKU: ${articleType.value}\n\n${researchBlock}STYL:\n- Piš česky, osobně, prakticky a bez turistických klišé. Opírej se o vlastní zkušenost z poznámek: my, já, za mě, pozor na, s dětmi pohoda.\n- Začni rovnou užitečným dojmem a pro koho cesta je. Přidej dopravu, auto, ubytování, ceny, děti, jídlo, parkování a varování jen pokud vyplývají z poznámek.\n- Nevymýšlej aktuální ceny, otevírací dobu, konkrétní hotel, výlet ani obsah fotky. Chybějící údaj označ [OVĚŘIT: co doplnit].\n- U plnohodnotného článku míř na 7 300 znaků včetně mezer; přirozené rozmezí je 6 500-8 500 znaků. Délku vyplň konkrétními užitečnými detaily, ne vatou.\n- Používej jen <h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>. Nevkládej obsahový box.\n\nPRAVIDLA PRO ODKAZY:\n${affiliateBlock}\n\nFOTKY:\n${photoBlock}\n\nVRAŤ V TOMTO POŘADÍ:\n1. Tři návrhy titulku\n2. Doporučený slug\n3. Meta description (150-160 znaků)\n4. Stručnou osnovu\n5. WordPress HTML draft\n6. Použité odkazy: služba nebo materiál, přesná kotva, důvod a sekce článku\n7. Fotky: soubor, navržené umístění, alt text k doplnění\n8. Co ověřit nebo doplnit\n\nHRUBÝ KONCEPT:\n${notes}`;
       actionStatus.textContent = "Zadání je připravené níže.";
       promptPanel.scrollIntoView({ behavior: "smooth", block: "start" });
       output.focus({ preventScroll: true });
     }
     document.getElementById("photos").addEventListener("change", event => { [...event.target.files].forEach(file => photos.push({ file, preview: URL.createObjectURL(file) })); event.target.value = ""; renderPhotos(); });
+    researchEnabled.addEventListener("change", syncResearchSources);
     document.getElementById("fillExample").addEventListener("click", () => { if (!brief.value.trim()) brief.value = "## Kdy jsme tam byli\n\n## S kým jsme cestovali\n\n## Jak jsme se tam dostali\n- Letenky / doprava:\n- Cena:\n- Co si pohlídat:\n\n## Ubytování\n- Kde:\n- Cena:\n- Plusy / mínusy:\n\n## Doprava na místě\n- Auto / MHD / pěšky:\n- Parkování a řízení:\n\n## Co vidět\n1.\n2.\n3.\n\n## Jídlo, děti a na co pozor"; brief.focus(); });
     document.getElementById("buildPrompt").addEventListener("click", buildPrompt);
     document.getElementById("copyPrompt").addEventListener("click", async () => { if (!output.value.trim()) buildPrompt(); await navigator.clipboard.writeText(output.value); });
@@ -200,8 +214,8 @@
     articleHtml.addEventListener("input", renderPreview);
     document.getElementById("saveAffiliates").addEventListener("click", () => { localStorage.setItem(storageKey, JSON.stringify(affiliates)); });
     document.getElementById("addAffiliate").addEventListener("click", () => { const name = document.getElementById("customName").value.trim(); const url = document.getElementById("customUrl").value.trim(); if (!name || !/^https?:\/\//i.test(url)) return; affiliates.push({ id: `custom-${Date.now()}`, name, url, use: "Vlastní služba; použij jen když vyplývá z obsahu článku.", checked: true }); document.getElementById("customName").value = ""; document.getElementById("customUrl").value = ""; renderAffiliates(); });
-    document.getElementById("clearAll").addEventListener("click", () => { destination.value = ""; brief.value = ""; output.value = ""; articleHtml.value = ""; photos.forEach(item => URL.revokeObjectURL(item.preview)); photos = []; renderPhotos(); renderPreview(); });
-    renderAffiliates(); renderPhotos(); renderPreview();
+    document.getElementById("clearAll").addEventListener("click", () => { destination.value = ""; brief.value = ""; output.value = ""; articleHtml.value = ""; researchEnabled.checked = false; syncResearchSources(); photos.forEach(item => URL.revokeObjectURL(item.preview)); photos = []; renderPhotos(); renderPreview(); });
+    renderAffiliates(); renderPhotos(); syncResearchSources(); renderPreview();
   </script>
 </body>
 </html>
