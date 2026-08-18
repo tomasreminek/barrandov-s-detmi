@@ -96,10 +96,14 @@
       { id: "guide-car-rentals", name: "Jak na autopůjčovny", url: "https://form.simpleshop.cz/D2Aqr/", use: "Vlastní návod: půjčení auta, pojištění a řízení v zahraničí.", checked: true, type: "own-product" },
       { id: "guide-cheap-holidays", name: "Kam na levnou dovolenou 2026", url: "https://form.simpleshop.cz/Kb5g6/", use: "Vlastní materiál: levná dovolená, rozpočet a výběr destinace.", checked: true, type: "own-product" },
       { id: "webinar-independent-travel", name: "Webinář: dovolená na vlastní pěst", url: "https://form.simpleshop.cz/gqD0/", use: "Vlastní webinář: samostatné plánování cesty, letenky a ubytování.", checked: true, type: "own-product" },
-      { id: "flying-with-children", name: "Cestování letadlem s dětmi", url: "https://www.cestujzababku.cz/cestovani-s-detmi-letadlem/", use: "Interní článek: let s dětmi, letiště, kočárek a zabavení během letu.", checked: true, type: "own-article" }
+      { id: "flying-with-children", name: "Cestování letadlem s dětmi", url: "https://www.cestujzababku.cz/cestovani-s-detmi-letadlem/", use: "Interní článek: let s dětmi, letiště, kočárek a zabavení během letu.", checked: true, type: "own-article" },
+      { id: "travel-materials", name: "Materiály k cestování na vlastní pěst", url: "https://www.cestujzababku.cz/materialy/", use: "Interní rozcestník: cestovní návody, mapy a materiály ke stažení či poslechu.", checked: true, type: "own-article" },
+      { id: "herohero-membership", name: "Herohero Cestuj za babku", url: "https://herohero.co/cestujzababku", use: "Vlastní členství: mapy, pomoc s letenkami a ubytováním na míru.", checked: true, type: "own-product" }
     ];
-    const storageKey = "czb-links-v2";
-    let affiliates = JSON.parse(localStorage.getItem(storageKey) || "null") || defaultAffiliates;
+    const storageKey = "czb-links-v3";
+    const savedLinks = JSON.parse(localStorage.getItem(storageKey) || localStorage.getItem("czb-links-v2") || "null");
+    const savedById = new Map((savedLinks || []).map(item => [item.id, item]));
+    let affiliates = savedLinks ? [...defaultAffiliates.map(item => ({ ...item, ...savedById.get(item.id) })), ...(savedLinks || []).filter(item => !defaultAffiliates.some(defaultItem => defaultItem.id === item.id))] : defaultAffiliates;
     let photos = [];
     const destination = document.getElementById("destination");
     const articleType = document.getElementById("articleType");
