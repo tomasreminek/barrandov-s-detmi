@@ -81,7 +81,7 @@
       </div></section>
       <aside class="stack">
         <section class="panel"><div class="panel-head"><h2>Fotky k článku</h2><span class="chip" id="photoCount">0 fotek</span></div><div class="body"><label class="drop" for="photos"><strong>Nahrát obrázky</strong><span>JPG, PNG, WEBP; můžeš označit více souborů</span><input id="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><div class="media-list" id="mediaList"></div><p class="small">Do draftu se vloží přesné značky pro fotky. Při budoucím napojení na WordPress se sem přidá jejich automatický upload.</p></div></section>
-        <section class="panel"><div class="panel-head"><h2>Affiliate odkazy</h2><button class="button ghost" id="saveAffiliates" type="button">Uložit změny</button></div><div class="body"><div class="notice">Vybrané odkazy se vloží jen tam, kde je to pro čtenáře užitečné. Služba se v textu nesmí opakovat a konkrétní hotel ani zážitek se nesmí domýšlet.</div><div class="affiliate-list" id="affiliateList" style="margin-top:12px"></div><div class="custom"><input id="customName" placeholder="Název vlastní služby"><input id="customUrl" type="url" placeholder="https://..."><button class="button secondary" id="addAffiliate" type="button">Přidat</button></div></div></section>
+        <section class="panel"><div class="panel-head"><h2>Odkazy do článku</h2><button class="button ghost" id="saveAffiliates" type="button">Uložit změny</button></div><div class="body"><div class="notice">Vlastní materiály a interní články mají přednost, když k tématu přesně sedí. Každý odkaz se použije jen tam, kde je pro čtenáře užitečný, a maximálně jednou.</div><div class="affiliate-list" id="affiliateList" style="margin-top:12px"></div><div class="custom"><input id="customName" placeholder="Název vlastního odkazu"><input id="customUrl" type="url" placeholder="https://..."><button class="button secondary" id="addAffiliate" type="button">Přidat</button></div></div></section>
       </aside>
     </div>
     <section class="panel output-panel" id="promptPanel"><div class="panel-head"><h2>Zadání pro agenta</h2><span class="chip">Připraveno ke kopírování</span></div><div class="body"><textarea class="output" id="output" readonly placeholder="Tady se objeví zadání pro agenta, který vytvoří WordPress HTML draft."></textarea></div></section>
@@ -92,9 +92,13 @@
     const defaultAffiliates = [
       { id: "discover-cars", name: "Discover Cars", url: "https://www.discovercars.com/?a_aid=Cestujzababku", use: "Půjčení auta, autopůjčovna, roadtrip a řízení v destinaci.", checked: true },
       { id: "stay22-booking", name: "Stay22 / Booking", url: "https://booking.stay22.com/cestujzababku/uSnFh7SpHY", use: "Ubytování, hotel, apartmán a hledání noclehu.", checked: true },
-      { id: "getyourguide", name: "GetYourGuide", url: "https://gyg.me/cestujzababku-app", use: "Vstupenky, placené výlety, exkurze a zážitky.", checked: true }
+      { id: "getyourguide", name: "GetYourGuide", url: "https://gyg.me/cestujzababku-app", use: "Vstupenky, placené výlety, exkurze a zážitky.", checked: true, type: "affiliate" },
+      { id: "guide-car-rentals", name: "Jak na autopůjčovny", url: "https://form.simpleshop.cz/D2Aqr/", use: "Vlastní návod: půjčení auta, pojištění a řízení v zahraničí.", checked: true, type: "own-product" },
+      { id: "guide-cheap-holidays", name: "Kam na levnou dovolenou 2026", url: "https://form.simpleshop.cz/Kb5g6/", use: "Vlastní materiál: levná dovolená, rozpočet a výběr destinace.", checked: true, type: "own-product" },
+      { id: "webinar-independent-travel", name: "Webinář: dovolená na vlastní pěst", url: "https://form.simpleshop.cz/gqD0/", use: "Vlastní webinář: samostatné plánování cesty, letenky a ubytování.", checked: true, type: "own-product" },
+      { id: "flying-with-children", name: "Cestování letadlem s dětmi", url: "https://www.cestujzababku.cz/cestovani-s-detmi-letadlem/", use: "Interní článek: let s dětmi, letiště, kočárek a zabavení během letu.", checked: true, type: "own-article" }
     ];
-    const storageKey = "czb-affiliates-v1";
+    const storageKey = "czb-links-v2";
     let affiliates = JSON.parse(localStorage.getItem(storageKey) || "null") || defaultAffiliates;
     let photos = [];
     const destination = document.getElementById("destination");
@@ -129,8 +133,17 @@
           if (attribute.name.toLowerCase().startsWith("on") || attribute.name.toLowerCase() === "style") element.removeAttribute(attribute.name);
         });
         if (element.tagName === "A") {
-          element.setAttribute("target", "_blank");
-          element.setAttribute("rel", "sponsored nofollow");
+          const matchingLink = affiliates.find(item => item.url === element.getAttribute("href"));
+          if (matchingLink?.type === "own-article") {
+            element.removeAttribute("target");
+            element.removeAttribute("rel");
+          } else if (matchingLink?.type === "own-product") {
+            element.setAttribute("target", "_blank");
+            element.removeAttribute("rel");
+          } else {
+            element.setAttribute("target", "_blank");
+            element.setAttribute("rel", "sponsored nofollow");
+          }
         }
       });
       const walker = document.createTreeWalker(template.content, NodeFilter.SHOW_COMMENT);
@@ -167,9 +180,9 @@
       const chosen = selectedAffiliates();
       const dest = destination.value.trim() || "[DOPLNIT DESTINACI]";
       const notes = brief.value.trim() || "[DOPLNIT HRUBÉ POZNÁMKY]";
-      const affiliateBlock = chosen.length ? chosen.map(item => `- ${item.name}: ${item.url}\n  Použij jen, pokud se přirozeně týká obsahu. Jeden odkaz na službu maximálně jednou; kotvu napiš konkrétně podle věty a použij target="_blank" rel="sponsored nofollow".`).join("\n") : "- Žádný affiliate odkaz není pro tento draft vybraný.";
+      const affiliateBlock = chosen.length ? chosen.map(item => { const attributes = item.type === "own-article" ? "bez povinných atributů" : item.type === "own-product" ? "target=\"_blank\"" : "target=\"_blank\" rel=\"sponsored nofollow\""; const priority = item.type && item.type !== "affiliate" ? "Když přesně sedí k tématu, má přednost před affiliate odkazem. " : ""; return `- ${item.name}: ${item.url}\n  ${priority}Použij jen, pokud se přirozeně týká obsahu. Jeden odkaz maximálně jednou; kotvu napiš konkrétně podle věty a použij ${attributes}.`; }).join("\n") : "- Žádný odkaz není pro tento draft vybraný.";
       const photoBlock = photos.length ? photos.map((item, index) => `${index + 1}. ${item.file.name} -> umísti k relevantnímu odstavci jako <!-- FOTO: ${item.file.name} | alt: [OVĚŘIT ALT TEXT] -->`).join("\n") : "- Nejsou přiložené žádné fotky.";
-      output.value = `Připrav koncept článku ve stylu Cestuj za babku jako WordPress HTML draft.\n\nDESTINACE / TÉMA: ${dest}\nTYP ČLÁNKU: ${articleType.value}\n\nSTYL:\n- Piš česky, osobně, prakticky a bez turistických klišé. Opírej se o vlastní zkušenost z poznámek: my, já, za mě, pozor na, s dětmi pohoda.\n- Začni rovnou užitečným dojmem a pro koho cesta je. Přidej dopravu, auto, ubytování, ceny, děti, jídlo, parkování a varování jen pokud vyplývají z poznámek.\n- Nevymýšlej aktuální ceny, otevírací dobu, konkrétní hotel, výlet ani obsah fotky. Chybějící údaj označ [OVĚŘIT: co doplnit].\n- U plnohodnotného článku míř na 7 300 znaků včetně mezer; přirozené rozmezí je 6 500-8 500 znaků. Délku vyplň konkrétními užitečnými detaily, ne vatou.\n- Používej jen <h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>. Nevkládej obsahový box.\n\nAFFILIATE PRAVIDLA:\n${affiliateBlock}\n\nFOTKY:\n${photoBlock}\n\nVRAŤ V TOMTO POŘADÍ:\n1. Tři návrhy titulku\n2. Doporučený slug\n3. Meta description (150-160 znaků)\n4. Stručnou osnovu\n5. WordPress HTML draft\n6. Použité affiliate odkazy: služba, přesná kotva, důvod a sekce článku\n7. Fotky: soubor, navržené umístění, alt text k doplnění\n8. Co ověřit nebo doplnit\n\nHRUBÝ KONCEPT:\n${notes}`;
+      output.value = `Připrav koncept článku ve stylu Cestuj za babku jako WordPress HTML draft.\n\nDESTINACE / TÉMA: ${dest}\nTYP ČLÁNKU: ${articleType.value}\n\nSTYL:\n- Piš česky, osobně, prakticky a bez turistických klišé. Opírej se o vlastní zkušenost z poznámek: my, já, za mě, pozor na, s dětmi pohoda.\n- Začni rovnou užitečným dojmem a pro koho cesta je. Přidej dopravu, auto, ubytování, ceny, děti, jídlo, parkování a varování jen pokud vyplývají z poznámek.\n- Nevymýšlej aktuální ceny, otevírací dobu, konkrétní hotel, výlet ani obsah fotky. Chybějící údaj označ [OVĚŘIT: co doplnit].\n- U plnohodnotného článku míř na 7 300 znaků včetně mezer; přirozené rozmezí je 6 500-8 500 znaků. Délku vyplň konkrétními užitečnými detaily, ne vatou.\n- Používej jen <h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>. Nevkládej obsahový box.\n\nPRAVIDLA PRO ODKAZY:\n${affiliateBlock}\n\nFOTKY:\n${photoBlock}\n\nVRAŤ V TOMTO POŘADÍ:\n1. Tři návrhy titulku\n2. Doporučený slug\n3. Meta description (150-160 znaků)\n4. Stručnou osnovu\n5. WordPress HTML draft\n6. Použité odkazy: služba nebo materiál, přesná kotva, důvod a sekce článku\n7. Fotky: soubor, navržené umístění, alt text k doplnění\n8. Co ověřit nebo doplnit\n\nHRUBÝ KONCEPT:\n${notes}`;
       actionStatus.textContent = "Zadání je připravené níže.";
       promptPanel.scrollIntoView({ behavior: "smooth", block: "start" });
       output.focus({ preventScroll: true });
