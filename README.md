@@ -1,5 +1,5 @@
-# Barrandov s dětmi
+# Cestuj za babku - redakční pomocník
 
-Samostatná vizuální ukázka článku ve stylu Cestuj za babku.
+Kořen webu obsahuje redakční aplikaci pro přípravu článků. Ukázkový článek je dostupný na `/barrandov.html`.
 
-Text a fotografie jsou vytvořené jako redakční demo. Před publikací je nutné ověřit osobní zkušenost, aktuální provoz a případné ceny.
+Text a fotografie v ukázce jsou vytvořené jako redakční demo. Před publikací je nutné ověřit osobní zkušenost, aktuální provoz a případné ceny.

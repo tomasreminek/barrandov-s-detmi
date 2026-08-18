@@ -3,89 +3,188 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Barrandov s dětmi: naše odpoledne v Prokopském údolí | Ukázka</title>
+  <title>Cestuj za babku - redakční pomocník</title>
   <style>
-    :root { --ink:#202724; --green:#075d49; --muted:#63746e; --line:#d8e1dc; --paper:#f6f8f5; }
+    :root { --ink:#18302a; --muted:#63746e; --line:#d8e1dc; --paper:#f6f8f5; --panel:#fff; --green:#087c61; --green-dark:#065541; --yellow:#f4b63e; --mint:#eaf5f0; --peach:#fff5e5; }
     * { box-sizing:border-box; }
-    body { margin:0; color:var(--ink); background:var(--paper); font-family:Georgia,"Times New Roman",serif; font-size:18px; line-height:1.7; }
-    .notice { padding:10px 18px; color:#5d491c; background:#fff5e5; border-bottom:1px solid #ead6a6; font:700 13px/1.4 Arial,sans-serif; text-align:center; }
-    article { width:min(760px,calc(100% - 36px)); margin:0 auto; padding:42px 0 70px; }
-    .eyebrow { margin:0 0 10px; color:var(--green); font:800 13px/1 Arial,sans-serif; text-transform:uppercase; letter-spacing:0; }
-    h1 { margin:0 0 18px; color:#18302a; font:800 42px/1.08 Arial,sans-serif; letter-spacing:0; }
-    h2 { margin:52px 0 16px; color:var(--green); font:800 29px/1.2 Arial,sans-serif; letter-spacing:0; }
-    h3 { margin:32px 0 10px; color:#18302a; font:800 21px/1.3 Arial,sans-serif; letter-spacing:0; }
-    p { margin:0 0 21px; }
-    ul { margin:0 0 24px; padding-left:25px; }
-    li { margin-bottom:7px; }
-    strong { color:#0a533f; }
-    a { color:#087c61; font-weight:700; text-decoration-thickness:2px; text-underline-offset:3px; }
-    figure { margin:34px 0; }
-    figure img { display:block; width:100%; height:auto; border-radius:6px; }
-    figcaption { margin-top:8px; color:var(--muted); font:13px/1.4 Arial,sans-serif; }
-    .lead { color:#35443e; font-size:21px; line-height:1.58; }
-    .tip { margin:32px 0; padding:20px 22px; border-left:4px solid #f4b63e; background:#fff9ee; }
-    .tip p:last-child { margin-bottom:0; }
-    .meta { margin:0 0 28px; color:var(--muted); font:14px/1.4 Arial,sans-serif; }
-    @media (max-width:600px) { body { font-size:17px; } article { width:min(100% - 24px,760px); padding-top:28px; } h1 { font-size:33px; } h2 { font-size:25px; } }
+    body { margin:0; color:var(--ink); background:var(--paper); font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+    button,input,select,textarea { font:inherit; }
+    button { cursor:pointer; }
+    .wrap { width:min(1220px,calc(100vw - 32px)); margin:0 auto; }
+    header { background:#fff; border-bottom:1px solid var(--line); }
+    .topbar { min-height:76px; display:flex; justify-content:space-between; align-items:center; gap:20px; }
+    .brand { display:flex; align-items:center; gap:12px; font-weight:800; }
+    .mark { display:grid; place-items:center; width:40px; height:40px; color:#fff; background:var(--green); border-radius:8px; font-size:13px; }
+    .sub { color:var(--muted); font-size:13px; font-weight:500; margin-top:2px; }
+    .chip { border:1px solid #b9d8cd; background:var(--mint); color:var(--green-dark); border-radius:999px; padding:5px 10px; font-size:13px; font-weight:700; }
+    main { padding:26px 0 42px; }
+    h1 { margin:0; font-size:30px; line-height:1.15; letter-spacing:0; }
+    .lead { margin:8px 0 24px; color:var(--muted); line-height:1.5; }
+    .layout { display:grid; grid-template-columns:minmax(0,1fr) 390px; gap:20px; align-items:start; }
+    .stack { display:grid; gap:20px; }
+    .panel { background:var(--panel); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+    .panel-head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:15px 18px; border-bottom:1px solid var(--line); }
+    h2 { margin:0; font-size:17px; letter-spacing:0; }
+    .body { padding:18px; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px; }
+    label { display:block; margin:0 0 7px; font-size:12px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:0; }
+    input,select,textarea { width:100%; border:1px solid var(--line); border-radius:6px; color:var(--ink); background:#fff; }
+    input,select { min-height:42px; padding:9px 10px; }
+    textarea { min-height:330px; padding:12px; line-height:1.48; resize:vertical; }
+    .output { min-height:300px; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:12px; }
+    .article-html { min-height:360px; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:12px; }
+    .output-panel { margin-top:20px; }
+    .preview-frame { width:100%; min-height:720px; border:1px solid var(--line); border-radius:6px; background:#fff; }
+    .section-note { margin:0; color:var(--muted); font-size:13px; line-height:1.45; }
+    .actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:15px; }
+    .action-status { align-self:center; color:var(--green-dark); font-size:13px; font-weight:700; }
+    .button { min-height:40px; padding:9px 12px; border:1px solid transparent; border-radius:6px; font-weight:750; }
+    .primary { color:#fff; background:var(--green); }
+    .primary:hover { background:var(--green-dark); }
+    .secondary { color:var(--green-dark); background:var(--mint); border-color:#cfe7dc; }
+    .ghost { color:var(--muted); background:#fff; border-color:var(--line); }
+    .small { color:var(--muted); font-size:13px; line-height:1.45; margin:10px 0 0; }
+    .drop { display:grid; place-items:center; min-height:104px; padding:16px; border:1px dashed #9ec5b7; border-radius:6px; background:#f8fcfa; color:var(--green-dark); text-align:center; }
+    .drop input { display:none; }
+    .drop strong { display:block; font-size:14px; }
+    .drop span { margin-top:4px; color:var(--muted); font-size:12px; }
+    .media-list { display:grid; gap:8px; margin-top:12px; }
+    .media { display:flex; gap:9px; align-items:center; min-width:0; padding:7px; background:#f8faf8; border:1px solid #e6ece8; border-radius:6px; }
+    .thumb { width:42px; height:42px; object-fit:cover; border-radius:4px; background:#e7efeb; flex:0 0 auto; }
+    .file-name { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:13px; font-weight:700; }
+    .file-size { color:var(--muted); font-size:12px; margin-top:2px; }
+    .remove { margin-left:auto; width:30px; height:30px; border:1px solid var(--line); border-radius:5px; background:#fff; color:var(--muted); font-size:19px; line-height:1; }
+    .affiliate-list { display:grid; gap:9px; }
+    .affiliate { border:1px solid var(--line); border-radius:6px; padding:11px; }
+    .affiliate-top { display:flex; align-items:center; gap:9px; }
+    .affiliate input[type="checkbox"] { width:18px; height:18px; accent-color:var(--green); flex:0 0 auto; }
+    .affiliate-name { font-size:14px; font-weight:800; }
+    .affiliate-rule { margin:4px 0 8px 27px; color:var(--muted); font-size:12px; line-height:1.35; }
+    .affiliate-url { margin-left:27px; width:calc(100% - 27px); min-height:35px; padding:7px; font-size:12px; }
+    .custom { display:grid; grid-template-columns:1fr auto; gap:8px; margin-top:10px; }
+    .custom input { min-width:0; }
+    .notice { padding:11px 12px; background:var(--peach); border-left:3px solid var(--yellow); color:#5d491c; font-size:13px; line-height:1.4; }
+    @media (max-width:950px) { .layout { grid-template-columns:1fr; } .output { min-height:360px; } }
+    @media (max-width:600px) { .wrap { width:min(100vw - 24px,1220px); } .topbar { min-height:68px; } .chip { display:none; } .grid { grid-template-columns:1fr; } .custom { grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
-  <div class="notice">Ukázkový redakční draft s vygenerovanými ilustračními fotkami. Před publikací ověřit osobní zkušenost, aktuální provoz i případné ceny.</div>
-  <article>
-    <p class="eyebrow">Praha s dětmi</p>
-    <h1>Barrandov s dětmi: naše odpoledne, kdy jsme z Prahy na chvíli zmizeli</h1>
-    <p class="meta">Doporučený slug: barrandov-s-detmi-prokopske-udoli &middot; Meta description: Barrandov s dětmi není jen sídliště. Ukážeme vám lehké odpoledne v Prokopském údolí, tipy na piknik i na co dát pozor.</p>
-    <p class="lead">Barrandov jsme měli dlouho zaškatulkovaný jako místo, kam se prostě jede tramvají a zase se z něj jede pryč. Jenže pak jsme s dětmi vyrazili směrem k Prokopskému údolí a najednou jsme měli pocit, že jsme z Prahy zmizeli aspoň na půl dne. Skály, louka, cesta, kde děti konečně nemusíte každých pět minut honit mezi auty. Za mě super plán na víkend, když nechcete vymýšlet žádnou velkou výpravu.</p>
-
-    <figure>
-      <img src="assets/barrandov-prokopske-udoli.png" alt="Rodina s dětmi na cestě mezi skalami v Prokopském údolí">
-      <figcaption>Ilustrační foto pro náhled článku: krátká procházka v Prokopském údolí.</figcaption>
-    </figure>
-
-    <h2>Pro koho je Barrandov s dětmi fajn</h2>
-    <p>Nečekejte dětský zábavní park na každém kroku. Tohle je spíš volné odpoledne pro děti, které se potřebují proběhnout, posbírat pár kamínků a mít pocit, že objevují něco vlastního. Menší děti zvládnou kratší kus cesty, větší už budou bavit skály a naučné zastávky. Prokopské a Dalejské údolí je celoročně volně přístupné, jsou tu turistické trasy, cyklostezka, pikniková místa i dětské hřiště. Aktuální trasu si ale před cestou radši koukněte na <a href="https://prague.eu/cs/objevujte/prokopske-a-dalejske-udoli/" target="_blank" rel="nofollow">web Prague City Tourism</a>.</p>
-
-    <div class="tip"><p><strong>Za mě:</strong> Neplánovala bych to jako výkon. Vyberte jeden kratší okruh, přibalte pití a svačinu a nechte dětem čas. My jsme nakonec nejvíc času stejně strávili tam, kde v mapě žádná atrakce nebyla.</p></div>
-
-    <h2>Jak jsme si odpoledne poskládali</h2>
-    <h3>1. Pomalý start a cesta do údolí</h3>
-    <p>Na Barrandov se dá pohodlně dostat městskou dopravou, takže auto jsme tentokrát vůbec nepotřebovali. To je mimochodem příjemné hlavně v den, kdy nechcete řešit parkování a pak děti přesvědčovat, že ještě kousek dojdou. Když ale jedete do Prahy na delší roadtrip a chcete si přejet i okolí, auto si můžete předem porovnat přes <a href="https://www.discovercars.com/?a_aid=Cestujzababku" target="_blank" rel="sponsored nofollow">Discover Cars</a>. Jen sem samotným bych ho za nás nehnala.</p>
-
-    <h3>2. Skály, louka a tisíc zastávek po cestě</h3>
-    <p>Prokopské údolí je přesně ten typ místa, kde se dospělí chtějí projít a děti mají pořád co dělat. Jen pozor: v chráněném území se držte cest, nenechte děti lézt všude po skalách a nepočítejte s tím, že každá část bude vhodná pro kočárek. S menšími dětmi bych šla opravdu jen po pohodlném úseku a otočila se ve chvíli, kdy je to ještě pohoda.</p>
-
-    <h3>3. Piknik, který zachrání náladu</h3>
-    <p>My jsme měli v batohu pečivo, ovoce a jednu malou sladkost na konec. Zní to jako maličkost, ale venku je to vždycky lepší plán než hledat restauraci ve chvíli, kdy už jsou všichni hladoví. A jestli pojedete do Prahy na celý víkend, ubytování si předem můžete vyfiltrovat přes <a href="https://booking.stay22.com/cestujzababku/uSnFh7SpHY" target="_blank" rel="sponsored nofollow">Stay22 / Booking</a>. Za mě je s dětmi fajn nebýt úplně na druhém konci města.</p>
-
-    <figure>
-      <img src="assets/barrandov-piknik.png" alt="Děti na pikniku s výhledem na Prahu">
-      <figcaption>Ilustrační foto pro náhled článku: svačina venku často funguje lépe než pevný plán.</figcaption>
-    </figure>
-
-    <h2>Co bych s dětmi na Barrandově už neplánovala</h2>
-    <p>Hlavně bych tam netlačila moc věcí najednou. Když spojíte procházku, velký oběd, další přesun a ještě program v centru, je z toho akorát logistika. Barrandov funguje dobře právě tím, že je to normální volné odpoledne. Když vám zbyde energie na další den v Praze, mrkněte na <a href="https://gyg.me/cestujzababku-app" target="_blank" rel="sponsored nofollow">vstupenky a výlety přes GetYourGuide</a>, ale konkrétní aktivitu si vybírejte až podle věku dětí a aktuálního programu.</p>
-
-    <h2>Náš jednoduchý plán na půl dne</h2>
-    <p>My bychom vyrazili po snídani a neslibovali si návrat v přesný čas. Nejdřív pohodový přesun na Barrandov, pak kratší procházka do údolí, svačina někde venku a cesta zpátky ve chvíli, kdy jsou děti ještě v pohodě. Zní to banálně, ale přesně tohle nám s dětmi funguje nejvíc. Když plán necháte trochu volný, nemusíte pak nikoho přemlouvat, že se přece ještě musíme podívat na jednu vyhlídku, kterou jste si našli včera večer na internetu.</p>
-
-    <p>Na delší trasu bych si vzala papírovou mapu nebo aspoň dopředu staženou offline navigaci. V údolí člověk nemá potřebu pořád koukat do telefonu, ale děti se umí zeptat, kolik je to ještě daleko přesně ve chvíli, kdy to nevíte ani vy. A taky bych přibalila náhradní ponožky. Ne proto, že se tam nutně musí stát katastrofa, jen proto, že s dětmi je to jedna z těch věcí, které nezaberou místo a pak jste za hrdinu.</p>
-
-    <h3>Když se počasí otočí</h3>
-    <p>Za hezkého dne je Barrandov hlavně venkovní plán. Když začne foukat, pršet nebo se děti prostě rozhodnou, že dneska žádné kameny fakt sbírat nebudou, netlačila bych na pilu. V Praze se vždycky dá udělat jednodušší náhradní program, ale aktuální otevírací dobu a vhodnost pro věk dětí si ověřte až ten den. Za mě je lepší včas otočit výpravu na svačinu než z ní dělat rodinnou legendu o tom, jak všichni promrzli, protože máma chtěla dojít až na konec trasy.</p>
-
-    <h3>Co bych příště přibalila navíc</h3>
-    <p>Malou deku, vlhčené ubrousky a něco, co děti zabaví při cestě domů. My máme vyzkoušeno, že po procházce přijde zvláštní kombinace únavy a energie navíc. Chvíli jsou úplně hotové a za deset minut chtějí závodit po chodníku. Když jim dáte svačinu, vodu a nečekáte od nich už další velký výkon, dojedete domů všichni mnohem spokojenější.</p>
-
-    <h2>Prakticky na závěr</h2>
-    <ul>
-      <li><strong>Boty:</strong> Tenisky stačí na lehký úsek, po dešti bych ale nešla úplně nalehko.</li>
-      <li><strong>Kočárek:</strong> Držela bych se jen opravdu pohodlných cest. Terén si předem ověřte podle zvolené trasy.</li>
-      <li><strong>Jídlo a pití:</strong> Vemte si něco s sebou. Ušetříte si tím mraky nervů.</li>
-      <li><strong>Bezpečnost:</strong> Skály a chráněná příroda nejsou hřiště. Děti mějte v exponovaných místech u sebe.</li>
-      <li><strong>Ověřit před cestou:</strong> aktuální stav cest, případné uzavírky a provoz konkrétních míst.</li>
-    </ul>
-
-    <p>Za mě je Barrandov dobrý připomínák, že s dětmi nemusíte pokaždé vyrážet někam daleko. Stačí jedna tramvaj, malý batoh a plán, který se klidně může po cestě úplně změnit.</p>
-  </article>
+  <header><div class="wrap topbar"><div class="brand"><div class="mark">CZB</div><div>Cestuj za babku<div class="sub">Redakční pomocník pro koncepty článků</div></div></div><span class="chip">Styl + odkazy + fotky</span></div></header>
+  <main class="wrap">
+    <h1>Připrav článek tak, aby seděl na web i na čtenáře.</h1>
+    <p class="lead">Vlož cestovní zápis, vyber odkazy, přidej fotky a nech si připravit přesné zadání pro vytvoření WordPress draftu.</p>
+    <div class="layout">
+      <section class="panel"><div class="panel-head"><h2>Koncept článku</h2><button class="button ghost" id="fillExample" type="button">Vložit šablonu</button></div><div class="body">
+        <div class="grid"><div><label for="destination">Destinace / téma</label><input id="destination" placeholder="Např. Madeira s dětmi"></div><div><label for="articleType">Typ článku</label><select id="articleType"><option>Co vidět + MAPA</option><option>Naše dovolená s dětmi</option><option>Jak ušetřit</option><option>Itinerář</option><option>Praktický návod</option></select></div></div>
+        <div style="margin-top:15px"><label for="brief">Hrubé poznámky</label><textarea id="brief" placeholder="Napiš body klidně nepořádně: kdy jste byli, s kým, doprava, co bylo top, co se nepovedlo, ceny, ubytování, děti, co se vyplatí a na co pozor..."></textarea></div>
+    <div class="actions"><button class="button primary" id="buildPrompt" type="button">Připravit zadání</button><button class="button secondary" id="copyPrompt" type="button">Kopírovat výstup</button><button class="button ghost" id="clearAll" type="button">Vyčistit</button><span class="action-status" id="actionStatus" role="status" aria-live="polite"></span></div>
+      </div></section>
+      <aside class="stack">
+        <section class="panel"><div class="panel-head"><h2>Fotky k článku</h2><span class="chip" id="photoCount">0 fotek</span></div><div class="body"><label class="drop" for="photos"><strong>Nahrát obrázky</strong><span>JPG, PNG, WEBP; můžeš označit více souborů</span><input id="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple></label><div class="media-list" id="mediaList"></div><p class="small">Do draftu se vloží přesné značky pro fotky. Při budoucím napojení na WordPress se sem přidá jejich automatický upload.</p></div></section>
+        <section class="panel"><div class="panel-head"><h2>Affiliate odkazy</h2><button class="button ghost" id="saveAffiliates" type="button">Uložit změny</button></div><div class="body"><div class="notice">Vybrané odkazy se vloží jen tam, kde je to pro čtenáře užitečné. Služba se v textu nesmí opakovat a konkrétní hotel ani zážitek se nesmí domýšlet.</div><div class="affiliate-list" id="affiliateList" style="margin-top:12px"></div><div class="custom"><input id="customName" placeholder="Název vlastní služby"><input id="customUrl" type="url" placeholder="https://..."><button class="button secondary" id="addAffiliate" type="button">Přidat</button></div></div></section>
+      </aside>
+    </div>
+    <section class="panel output-panel" id="promptPanel"><div class="panel-head"><h2>Zadání pro agenta</h2><span class="chip">Připraveno ke kopírování</span></div><div class="body"><textarea class="output" id="output" readonly placeholder="Tady se objeví zadání pro agenta, který vytvoří WordPress HTML draft."></textarea></div></section>
+    <section class="panel output-panel"><div class="panel-head"><h2>WordPress HTML draft</h2><div class="actions" style="margin-top:0"><button class="button secondary" id="copyHtml" type="button">Kopírovat HTML</button><button class="button primary" id="exportWordPress" type="button">Exportovat pro WordPress</button></div></div><div class="body"><p class="section-note">Sem vlož HTML článek, který vrátí agent. Export vytvoří čistý soubor pro vložení do editoru WordPressu.</p><label for="articleHtml" style="margin-top:14px">HTML článku</label><textarea class="article-html" id="articleHtml" placeholder="<p>Sem vložte hotový WordPress HTML draft...</p>"></textarea></div></section>
+    <section class="panel output-panel"><div class="panel-head"><h2>Náhled článku</h2><span class="chip">Formátování Cestuj za babku</span></div><div class="body"><iframe class="preview-frame" id="articlePreview" title="Náhled WordPress článku" sandbox></iframe></div></section>
+  </main>
+  <script>
+    const defaultAffiliates = [
+      { id: "discover-cars", name: "Discover Cars", url: "https://www.discovercars.com/?a_aid=Cestujzababku", use: "Půjčení auta, autopůjčovna, roadtrip a řízení v destinaci.", checked: true },
+      { id: "stay22-booking", name: "Stay22 / Booking", url: "https://booking.stay22.com/cestujzababku/uSnFh7SpHY", use: "Ubytování, hotel, apartmán a hledání noclehu.", checked: true },
+      { id: "getyourguide", name: "GetYourGuide", url: "https://gyg.me/cestujzababku-app", use: "Vstupenky, placené výlety, exkurze a zážitky.", checked: true }
+    ];
+    const storageKey = "czb-affiliates-v1";
+    let affiliates = JSON.parse(localStorage.getItem(storageKey) || "null") || defaultAffiliates;
+    let photos = [];
+    const destination = document.getElementById("destination");
+    const articleType = document.getElementById("articleType");
+    const brief = document.getElementById("brief");
+    const output = document.getElementById("output");
+    const promptPanel = document.getElementById("promptPanel");
+    const actionStatus = document.getElementById("actionStatus");
+    const articleHtml = document.getElementById("articleHtml");
+    const articlePreview = document.getElementById("articlePreview");
+    const affiliateList = document.getElementById("affiliateList");
+    const mediaList = document.getElementById("mediaList");
+    function escapeHtml(value) { return value.replace(/[&<>'"]/g, char => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", "'":"&#039;", '"':"&quot;" })[char]); }
+    function formatSize(size) { return size < 1048576 ? `${Math.round(size / 1024)} kB` : `${(size / 1048576).toFixed(1)} MB`; }
+    function renderAffiliates() {
+      affiliateList.innerHTML = affiliates.map((item, index) => `<div class="affiliate"><div class="affiliate-top"><input id="affiliate-${index}" type="checkbox" ${item.checked ? "checked" : ""}><label class="affiliate-name" for="affiliate-${index}">${escapeHtml(item.name)}</label></div><p class="affiliate-rule">${escapeHtml(item.use)}</p><input class="affiliate-url" data-index="${index}" value="${escapeHtml(item.url)}" aria-label="Odkaz ${escapeHtml(item.name)}"></div>`).join("");
+      affiliateList.querySelectorAll('input[type="checkbox"]').forEach((input, index) => input.addEventListener("change", () => { affiliates[index].checked = input.checked; }));
+      affiliateList.querySelectorAll(".affiliate-url").forEach(input => input.addEventListener("input", () => { affiliates[Number(input.dataset.index)].url = input.value.trim(); }));
+    }
+    function renderPhotos() {
+      document.getElementById("photoCount").textContent = `${photos.length} ${photos.length === 1 ? "fotka" : photos.length < 5 ? "fotky" : "fotek"}`;
+      mediaList.innerHTML = photos.map((item, index) => `<div class="media"><img class="thumb" src="${item.preview}" alt=""><div style="min-width:0"><div class="file-name">${escapeHtml(item.file.name)}</div><div class="file-size">${formatSize(item.file.size)}</div></div><button class="remove" type="button" aria-label="Odebrat fotku" data-index="${index}">&times;</button></div>`).join("");
+      mediaList.querySelectorAll(".remove").forEach(button => button.addEventListener("click", () => { URL.revokeObjectURL(photos[Number(button.dataset.index)].preview); photos.splice(Number(button.dataset.index), 1); renderPhotos(); }));
+    }
+    function selectedAffiliates() { return affiliates.filter(item => item.checked && item.url); }
+    function sanitizeArticleHtml(html) {
+      const template = document.createElement("template");
+      template.innerHTML = html;
+      template.content.querySelectorAll("script, style, iframe, object, embed, form, input, button").forEach(element => element.remove());
+      template.content.querySelectorAll("*").forEach(element => {
+        [...element.attributes].forEach(attribute => {
+          if (attribute.name.toLowerCase().startsWith("on") || attribute.name.toLowerCase() === "style") element.removeAttribute(attribute.name);
+        });
+        if (element.tagName === "A") {
+          element.setAttribute("target", "_blank");
+          element.setAttribute("rel", "sponsored nofollow");
+        }
+      });
+      const walker = document.createTreeWalker(template.content, NodeFilter.SHOW_COMMENT);
+      const photoComments = [];
+      while (walker.nextNode()) photoComments.push(walker.currentNode);
+      photoComments.forEach(comment => {
+        if (comment.data.trim().toUpperCase().startsWith("FOTO:")) {
+          const figure = document.createElement("figure");
+          figure.className = "photo-placeholder";
+          figure.innerHTML = `<div>${escapeHtml(comment.data.trim())}</div><figcaption>Fotka bude při exportu do WordPressu vložena na toto místo.</figcaption>`;
+          comment.replaceWith(figure);
+        }
+      });
+      return template.innerHTML;
+    }
+    function renderPreview() {
+      const article = sanitizeArticleHtml(articleHtml.value.trim());
+      const emptyState = '<p class="empty">Sem se po vložení HTML zobrazí náhled článku. Formátování odpovídá redakčnímu stylu a fotky jsou označené místem vložení.</p>';
+      articlePreview.srcdoc = `<!doctype html><html lang="cs"><head><meta charset="utf-8"><style>body{max-width:760px;margin:0 auto;padding:42px 26px 70px;color:#202724;background:#fff;font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.68}h2{margin:46px 0 16px;color:#075d49;font-family:Arial,sans-serif;font-size:28px;line-height:1.2}h3{margin:30px 0 10px;color:#18302a;font-family:Arial,sans-serif;font-size:21px;line-height:1.3}p{margin:0 0 20px}ul,ol{margin:0 0 22px;padding-left:25px}li{margin-bottom:7px}strong{color:#0a533f}a{color:#087c61;font-weight:700;text-decoration-thickness:2px;text-underline-offset:3px}.photo-placeholder{margin:32px 0;border:1px solid #bdd7cc;background:#edf7f2;border-radius:6px;padding:26px;text-align:center;color:#087c61;font-family:Arial,sans-serif}.photo-placeholder div{font-weight:800}.photo-placeholder figcaption{margin-top:8px;color:#63746e;font-size:13px}.empty{margin-top:120px;text-align:center;color:#63746e;font-family:Arial,sans-serif}</style></head><body>${article || emptyState}</body></html>`;
+    }
+    function exportWordPressHtml() {
+      const html = articleHtml.value.trim();
+      if (!html) { articleHtml.focus(); return; }
+      const fileBase = (destination.value || "clanek-cestuj-za-babku").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "clanek-cestuj-za-babku";
+      const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${fileBase}-wordpress.html`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+    function buildPrompt() {
+      const chosen = selectedAffiliates();
+      const dest = destination.value.trim() || "[DOPLNIT DESTINACI]";
+      const notes = brief.value.trim() || "[DOPLNIT HRUBÉ POZNÁMKY]";
+      const affiliateBlock = chosen.length ? chosen.map(item => `- ${item.name}: ${item.url}\n  Použij jen, pokud se přirozeně týká obsahu. Jeden odkaz na službu maximálně jednou; kotvu napiš konkrétně podle věty a použij target="_blank" rel="sponsored nofollow".`).join("\n") : "- Žádný affiliate odkaz není pro tento draft vybraný.";
+      const photoBlock = photos.length ? photos.map((item, index) => `${index + 1}. ${item.file.name} -> umísti k relevantnímu odstavci jako <!-- FOTO: ${item.file.name} | alt: [OVĚŘIT ALT TEXT] -->`).join("\n") : "- Nejsou přiložené žádné fotky.";
+      output.value = `Připrav koncept článku ve stylu Cestuj za babku jako WordPress HTML draft.\n\nDESTINACE / TÉMA: ${dest}\nTYP ČLÁNKU: ${articleType.value}\n\nSTYL:\n- Piš česky, osobně, prakticky a bez turistických klišé. Opírej se o vlastní zkušenost z poznámek: my, já, za mě, pozor na, s dětmi pohoda.\n- Začni rovnou užitečným dojmem a pro koho cesta je. Přidej dopravu, auto, ubytování, ceny, děti, jídlo, parkování a varování jen pokud vyplývají z poznámek.\n- Nevymýšlej aktuální ceny, otevírací dobu, konkrétní hotel, výlet ani obsah fotky. Chybějící údaj označ [OVĚŘIT: co doplnit].\n- U plnohodnotného článku míř na 7 300 znaků včetně mezer; přirozené rozmezí je 6 500-8 500 znaků. Délku vyplň konkrétními užitečnými detaily, ne vatou.\n- Používej jen <h2>, <h3>, <p>, <ul>, <li>, <strong>, <a>. Nevkládej obsahový box.\n\nAFFILIATE PRAVIDLA:\n${affiliateBlock}\n\nFOTKY:\n${photoBlock}\n\nVRAŤ V TOMTO POŘADÍ:\n1. Tři návrhy titulku\n2. Doporučený slug\n3. Meta description (150-160 znaků)\n4. Stručnou osnovu\n5. WordPress HTML draft\n6. Použité affiliate odkazy: služba, přesná kotva, důvod a sekce článku\n7. Fotky: soubor, navržené umístění, alt text k doplnění\n8. Co ověřit nebo doplnit\n\nHRUBÝ KONCEPT:\n${notes}`;
+      actionStatus.textContent = "Zadání je připravené níže.";
+      promptPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+      output.focus({ preventScroll: true });
+    }
+    document.getElementById("photos").addEventListener("change", event => { [...event.target.files].forEach(file => photos.push({ file, preview: URL.createObjectURL(file) })); event.target.value = ""; renderPhotos(); });
+    document.getElementById("fillExample").addEventListener("click", () => { if (!brief.value.trim()) brief.value = "## Kdy jsme tam byli\n\n## S kým jsme cestovali\n\n## Jak jsme se tam dostali\n- Letenky / doprava:\n- Cena:\n- Co si pohlídat:\n\n## Ubytování\n- Kde:\n- Cena:\n- Plusy / mínusy:\n\n## Doprava na místě\n- Auto / MHD / pěšky:\n- Parkování a řízení:\n\n## Co vidět\n1.\n2.\n3.\n\n## Jídlo, děti a na co pozor"; brief.focus(); });
+    document.getElementById("buildPrompt").addEventListener("click", buildPrompt);
+    document.getElementById("copyPrompt").addEventListener("click", async () => { if (!output.value.trim()) buildPrompt(); await navigator.clipboard.writeText(output.value); });
+    document.getElementById("copyHtml").addEventListener("click", async () => { if (articleHtml.value.trim()) await navigator.clipboard.writeText(articleHtml.value); else articleHtml.focus(); });
+    document.getElementById("exportWordPress").addEventListener("click", exportWordPressHtml);
+    articleHtml.addEventListener("input", renderPreview);
+    document.getElementById("saveAffiliates").addEventListener("click", () => { localStorage.setItem(storageKey, JSON.stringify(affiliates)); });
+    document.getElementById("addAffiliate").addEventListener("click", () => { const name = document.getElementById("customName").value.trim(); const url = document.getElementById("customUrl").value.trim(); if (!name || !/^https?:\/\//i.test(url)) return; affiliates.push({ id: `custom-${Date.now()}`, name, url, use: "Vlastní služba; použij jen když vyplývá z obsahu článku.", checked: true }); document.getElementById("customName").value = ""; document.getElementById("customUrl").value = ""; renderAffiliates(); });
+    document.getElementById("clearAll").addEventListener("click", () => { destination.value = ""; brief.value = ""; output.value = ""; articleHtml.value = ""; photos.forEach(item => URL.revokeObjectURL(item.preview)); photos = []; renderPhotos(); renderPreview(); });
+    renderAffiliates(); renderPhotos(); renderPreview();
+  </script>
 </body>
 </html>
